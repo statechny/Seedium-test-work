@@ -5,10 +5,10 @@ import TableModel from './model';
 
 const Table: React.FunctionComponent<TableModel> = ({ academies }) => {
   const tableBody = academies.map((academy: any) => {
-    const { title, type, created, metrics } = academy;
+    const { title, type, created, metrics, _id } = academy;
     const createdDate = new Date(created).toLocaleDateString();
     return (
-      <tr>
+      <tr key={_id}>
         <td>{title}</td>
         <td>{type}</td>
         <td>{createdDate}</td>
