@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import Select from '../../components/Select';
-import useHttp from '../../hooks/htttp.hook';
+import useHttp from '../../hooks/http.hook';
 
 import { StyledForm } from './styled';
 import { StyledCaption } from '../../styled/typography';
@@ -25,23 +25,18 @@ const CreateAcademyForm: React.FunctionComponent = () => {
   const changeHandler = (event: {
     target: { name: string; value: string };
   }) => {
-    setForm({ ...form, [event.target.name]: event.target.value });
+    setForm({ ...form, [event.target.name]: event.target.value.trim() });
   };
 
   const selectHandler = (selectedOption: { name: string; value: string }) => {
-    setForm({ ...form, [selectedOption.name]: selectedOption.value });
+    setForm({ ...form, [selectedOption.name]: selectedOption.value.trim() });
   };
 
   const submitHandler = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
     try {
-      const response = await request(
-        '/academies',
-        'POST',
-        { ...form },
-        undefined
-      );
-      if (response) {
+      const response = await request('/academies', 'POST', { ...form });
+      if (response.ok) {
         history.push('/');
       }
       // eslint-disable-next-line no-empty

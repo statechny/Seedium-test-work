@@ -1,84 +1,60 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import useHttp from '../../hooks/htttp.hook';
+import React, { useState, useEffect } from 'react';
+import useHttp from '../../hooks/http.hook';
 
 import Table from '../../components/Table';
 
 const AcademiesTable: React.FunctionComponent = () => {
-  const { loading, request } = useHttp();
+  const { loading, request, error } = useHttp();
   const [academies, setAcademies] = useState([]);
   const [isNext, setIsNext] = useState<boolean>(false);
-  const [isPrev, setIsPrev] = useState<number>(0);
-  const [lastAcademy, setLastAcademy] = useState<string>('');
-  const [firstAcademy, setFirstAcademy] = useState<string>('');
+  const [prev, setIsPrev] = useState<number>(0);
+  const [query, setQuery] = useState('?limit=10');
 
-  const LIMIT = '?limit=10';
-
-  const fetchAcademies = useCallback(
-    async param => {
+  useEffect(() => {
+    const fetchAcademies = async (param: string) => {
       try {
-        const fetched = await request(`/academies${param}`, 'GET');
-        setAcademies(fetched.data);
-        setIsNext(fetched.hasMore);
-        return fetched;
-      } catch (e) {
-        throw e;
+        const result = await request(`/academies${param}`, 'GET');
+        setAcademies(result.data);
+        setIsNext(result.hasMore);
+      } catch (e) {}
+    };
+    fetchAcademies(query).then(() => {
+      if (query.includes('endingBefore')) {
+        setIsNext(true);
       }
-    },
-    [request]
-  );
+    });
+  }, [query, request]);
 
-  useEffect(() => {
-    fetchAcademies(LIMIT);
-  }, [fetchAcademies]);
-
-  const getLastAcademy = useCallback(
-    data => {
-      if (isNext) {
-        // eslint-disable-next-line no-underscore-dangle
-        setLastAcademy(`${LIMIT}&startingAfter=${data[data.length - 1]._id}`);
-      }
-    },
-    [isNext]
-  );
-
-  const getFirstAcademy = useCallback(
-    data => {
-      if (isPrev) {
-        // eslint-disable-next-line no-underscore-dangle
-        setFirstAcademy(`${LIMIT}&endingBefore=${data[0]._id}`);
-      }
-    },
-    [isPrev]
-  );
-
-  useEffect(() => {
-    getLastAcademy(academies);
-    getFirstAcademy(academies);
-  }, [getFirstAcademy, getLastAcademy, academies]);
-
-  const clickNextHandler = () => {
-    fetchAcademies(lastAcademy).then(() => setIsPrev(isPrev + 1));
+  const clickNextHandler = (data: string | any[]) => {
+    // eslint-disable-next-line no-underscore-dangle
+    setQuery(`?limit=10&startingAfter=${data[data.length - 1]._id}`);
+    setIsPrev(prev + 1);
   };
-  const clickPrevHandler = () => {
-    fetchAcademies(firstAcademy)
-      .then(() => setIsPrev(isPrev - 1))
-      .then(() => setIsNext(true));
+
+  const clickPrevHandler = (data: string | any[]) => {
+    // eslint-disable-next-line no-underscore-dangle
+    setQuery(`?limit=10&endingBefore=${data[0]._id}`);
+    setIsPrev(prev - 1);
   };
 
   if (loading) {
-    return <span> Loading..</span>;
+    return <span>Loading...</span>;
+  }
+
+  if (error) {
+    return <span>{error}</span>;
   }
 
   return (
     <>
       <Table academies={academies} />
-      {!!isPrev && (
-        <button type="button" onClick={() => clickPrevHandler()}>
+      {Boolean(prev) && (
+        <button type="button" onClick={() => clickPrevHandler(academies)}>
           PREVIOUS
         </button>
       )}
       {isNext && (
-        <button type="button" onClick={() => clickNextHandler()}>
+        <button type="button" onClick={() => clickNextHandler(academies)}>
           NEXT
         </button>
       )}

@@ -1,11 +1,11 @@
 import React from 'react';
-import Select from 'react-select';
+import ReactSelect from 'react-select';
 import SelectModel from './model';
 
 import { StyledLabel } from '../../styled/typography';
 import { StyledSelect } from './styled';
 
-const MySelect: React.FunctionComponent<SelectModel> = ({
+const Select: React.FunctionComponent<SelectModel> = ({
   options,
   label,
   changeHandler,
@@ -13,9 +13,13 @@ const MySelect: React.FunctionComponent<SelectModel> = ({
   return (
     <>
       <StyledLabel>{label}</StyledLabel>
-      <StyledSelect as={Select} options={options} onChange={changeHandler} />
+      <StyledSelect
+        as={ReactSelect}
+        options={options}
+        onChange={changeHandler}
+      />
     </>
   );
 };
 
-export default MySelect;
+export default Select;

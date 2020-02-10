@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 
 import { Container } from '../../styled';
 import { StyledHeader, Logo, FlexRow, StyledLink } from './styled';
@@ -9,7 +9,7 @@ const Header: React.FunctionComponent = () => {
     <StyledHeader>
       <Container>
         <FlexRow>
-          <Logo href="/">
+          <Logo as={Link} to="/">
             <h1>Academies</h1>
           </Logo>
           <nav>
